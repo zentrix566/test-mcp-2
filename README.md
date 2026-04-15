@@ -1,14 +1,18 @@
 # WiFi Password Query MCP Server
 
-一个简单的 MCP (Model Context Protocol) 服务器，提供 `get_wifi_password` 工具来查询预设的 WiFi 密码。
+一个简单的 MCP (Model Context Protocol) 服务器，提供 WiFi 密码查询、餐厅菜单查询、排队状态查询。
 
 ## 功能
 
-- 符合 MCP 协议规范
-- 提供 `get_wifi_password` 工具
+- 符合 MCP 协议规范 (Streamable HTTP)
+- 提供三个工具：
+  - `get_wifi_password` - 查询预设 WiFi 密码
+  - `get_menu` - 查询餐厅主要菜单
+  - `get_queue_status` - 查询当前排队人数和预计等待时间
+- 配置通过 `config.json` 外部化，支持**热加载**（修改配置无需重启服务）
 - 完善的错误处理，返回标准 MCP 错误格式
-- 配置通过环境变量外部化
 - 健康检查端点
+- 所有日志带时间戳，便于调试
 
 ## 快速开始
 
@@ -26,13 +30,43 @@ python server.py
 
 默认配置：
 - 地址: `http://127.0.0.1:8000`
-- 密码: `123456` (可通过环境变量修改)
 
-### 环境变量配置
+### 配置说明
+
+所有配置都在 `config.json`：
+
+```json
+{
+  "wifi_password": "123789",
+  "menu": [
+    "鲅鱼饺子",
+    "葱麻鸡",
+    "羊肉锅贴"
+  ],
+  "queue": {
+    "min_people": 5,
+    "max_people": 30,
+    "minutes_per_person": 8
+  }
+}
+```
+
+| 配置项 | 说明 |
+|--------|------|
+| `wifi_password` | WiFi 密码 |
+| `menu` | 餐厅菜单列表 |
+| `queue.min_people` | 最小排队人数（随机生成） |
+| `queue.max_people` | 最大排队人数（随机生成） |
+| `queue.minutes_per_person` | 每人预估等待分钟 |
+
+**热加载特性**：修改 `config.json` 后无需重启服务，下次请求自动读取新配置。
+
+### 环境变量
 
 | 环境变量 | 说明 | 默认值 |
 |----------|------|--------|
-| `WIFI_PASSWORD` | WiFi 密码 | `123456` |
+| `CONFIG_PATH` | 配置文件路径 | `config.json` |
+| `WIFI_PASSWORD` | 覆盖 WiFi 密码（优先级高于配置文件） | - |
 | `HOST` | 绑定地址 | `127.0.0.1` |
 | `PORT` | 监听端口 | `8000` |
 
@@ -46,14 +80,25 @@ python server.py
 
 ## MCP API
 
-### `POST /mcp` - 工具发现
-返回可用工具列表。
+### `GET /` - 服务信息
+返回服务状态和可用工具列表。
+
+### `GET /health` - 健康检查
+```json
+{
+  "status": "healthy"
+}
+```
+
+### `POST /mcp` - MCP 主端点
+支持标准 MCP Streamable HTTP 协议。
 
 ### `POST /mcp/list-tools` - 列出工具
 返回所有可用工具定义。
 
 ### `POST /mcp/call-tool` - 调用工具
-**请求体：**
+
+**WiFi 密码查询：**
 ```json
 {
   "name": "get_wifi_password",
@@ -63,29 +108,60 @@ python server.py
 }
 ```
 
-**响应：**
+**菜单查询：**
+```json
+{
+  "name": "get_menu",
+  "parameters": {
+    "question": "今天菜单有什么？"
+  }
+}
+```
+
+响应示例：
 ```json
 {
   "content": [
     {
       "type": "text",
-      "text": "当前WiFi密码是: 123456"
+      "text": "餐厅主要菜单：\n• 鲅鱼饺子\n• 葱麻鸡\n• 羊肉锅贴\n• 牛肉锅贴"
     }
   ],
   "is_error": false
 }
 ```
 
-### `GET /health` - 健康检查
+**排队状态查询：**
 ```json
 {
-  "status": "healthy"
+  "name": "get_queue_status",
+  "parameters": {
+    "question": "现在前面排了多少人？"
+  }
 }
 ```
 
-## Claude Desktop 配置
+响应示例：
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "当前排了 12 人！估计需要 1小时36分钟！"
+    }
+  ],
+  "is_error": false
+}
+```
 
-在你的 `claude_desktop_config.json` 中添加：
+等待时间自动格式化：
+- 小于 1 小时 → 显示 `XX分钟`
+- 大于 1 小时小于 1 天 → 显示 `X小时X分钟`
+- 大于 1 天 → 显示 `X天X小时X分钟`
+
+## Claude Desktop / Claude Code 配置
+
+在你的配置中添加：
 
 ```json
 {
@@ -95,6 +171,17 @@ python server.py
     }
   }
 }
+```
+
+## 项目结构
+
+```
+├── server.py       # 主程序
+├── config.json     # 配置文件（热加载）
+├── requirements.txt
+├── skill.json      # Claude Code Skill 定义
+├── skill.md        # Claude Code Skill 文档
+└── README.md
 ```
 
 ## 许可证

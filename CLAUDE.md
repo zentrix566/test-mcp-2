@@ -2,7 +2,12 @@
 
 ## Project Overview
 
-This is a simple MCP (Model Context Protocol) server that provides a `get_wifi_password` tool for Claude to retrieve a pre-configured WiFi password.
+This is a simple MCP (Model Context Protocol) server that provides three tools for Claude:
+- `get_wifi_password` - Retrieve a pre-configured WiFi password
+- `get_menu` - Get restaurant main menu
+- `get_queue_status` - Get current queue count and estimated wait time
+
+Configuration is stored in `config.json` and supports **hot reload** - changes take effect on next request without server restart.
 
 ## Development Commands
 

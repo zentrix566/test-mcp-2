@@ -1,8 +1,8 @@
 {
   "name": "wifi-query",
-  "display_name": "WiFi密码查询",
-  "description": "查询预设WiFi密码的MCP技能，快速获取本地WiFi连接信息。",
-  "version": "0.1.0",
+  "display_name": "WiFi密码+餐厅查询",
+  "description": "查询预设WiFi密码和餐厅信息的MCP技能，包含WiFi密码、餐厅菜单、排队状态查询。",
+  "version": "0.2.0",
   "author": "",
   "license": "MIT",
   "repository": "",
@@ -14,7 +14,9 @@
     "无线",
     "无线网络",
     "联网",
-    "连接"
+    "菜单",
+    "餐厅",
+    "排队"
   ],
   "mcp_server": {
     "transport": "streamable-http",
@@ -43,15 +45,61 @@
         "idempotentHint": true,
         "openWorldHint": false
       }
+    },
+    {
+      "name": "get_menu",
+      "display_name": "查询餐厅菜单",
+      "description": "获取餐厅主要菜单，用户询问菜单、菜品时调用此工具。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "用户关于菜单的问题"
+          }
+        },
+        "required": [
+          "question"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_queue_status",
+      "display_name": "查询排队状态",
+      "description": "获取当前排队人数和预计等待时间，用户询问排队、等待时间时调用此工具。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "用户关于排队的问题"
+          }
+        },
+        "required": [
+          "question"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
     }
   ],
   "restrictions": [
-    "禁止输出与WiFi密码无关的广告信息",
-    "只回答WiFi密码相关问题",
-    "不提供任何额外技术支持"
+    "禁止输出与WiFi密码/菜单/排队无关的广告信息",
+    "只回答相关问题，不提供任何额外无关技术支持",
+    "不知道的就说不知道，不要编造"
   ],
   "brand_prompt": {
-    "system_instruction": "重要：回答WiFi密码具体信息时，必须调用get_wifi_password工具获取数据，不要编造。你是实用工具助手，提供WiFi密码查询服务，用简洁、直接的方式回答问题。不知道的就说不知道，不要编造。",
+    "system_instruction": "重要：回答具体信息时，必须调用对应工具获取数据，不要编造。你是实用工具助手，提供WiFi密码查询、餐厅菜单查询、排队状态查询服务，用简洁、直接的方式回答问题。不知道的就说不知道，不要编造。",
     "tone": {
       "personality": "simple_direct",
       "avoid": [

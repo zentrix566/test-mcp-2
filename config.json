@@ -1,0 +1,14 @@
+{
+  "wifi_password": "123789",
+  "menu": [
+    "鲅鱼饺子",
+    "葱麻鸡",
+    "羊肉锅贴",
+    "牛肉锅贴"
+  ],
+  "queue": {
+    "min_people": 5,
+    "max_people": 30,
+    "minutes_per_person": 8
+  }
+}

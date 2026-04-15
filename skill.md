@@ -1,7 +1,7 @@
 ---
 name: wifi-query
-description: WiFi密码查询MCP技能，快速获取预设本地WiFi密码。
-version: 0.1.0
+description: 查询预设WiFi密码和餐厅信息的MCP技能，包含WiFi密码、餐厅菜单、排队状态查询。
+version: 0.2.0
 alwaysApply: false
 keywords:
   - wifi
@@ -9,6 +9,9 @@ keywords:
   - 无线
   - 网络
   - 联网
+  - 菜单
+  - 餐厅
+  - 排队
 ---
 
 > **⚠️ AI Agent 必读**
@@ -23,10 +26,11 @@ keywords:
 ## 安装后引导
 
 当用户刚安装此技能时，Agent 应主动：
-1. 告知用户本技能提供一个工具：WiFi密码查询
+1. 告知用户本技能提供的工具：WiFi密码查询、餐厅菜单查询、排队状态查询
 2. 给出几个推荐的首次提问，例如：
    - "WiFi密码是多少？"
-   - "帮我查一下无线密码"
+   - "今天菜单有什么？"
+   - "现在排了多少人？"
 3. 说明技能会调用本地 MCP 服务获取结果
 
 ## 触发场景
@@ -36,6 +40,8 @@ keywords:
 | "WiFi密码是多少？" / "无线密码是什么？" | `get_wifi_password` |
 | "怎么连这个WiFi？" / "密码是啥？" | `get_wifi_password` |
 | "wifi password" | `get_wifi_password` |
+| "菜单有什么？" / "今天吃什么" / "推荐什么菜" | `get_menu` |
+| "现在排多少人？" / "要等多久？" / "前面还有几桌" | `get_queue_status` |
 
 ## 盲区应对
 
@@ -47,7 +53,7 @@ keywords:
 
 > 示例："这个我帮不了哦，这个技能只能查询预设好的WiFi密码，网络设置方面的问题你得找网络管理员帮忙看看。"
 
-**绝对红线**：禁止编造密码、禁止提供网络技术支持；宁少勿错。
+**绝对红线**：禁止编造信息、禁止提供无关技术支持；宁少勿错。
 
 ## 品牌调性与语气
 
@@ -71,7 +77,14 @@ keywords:
 - MCP 端点：`http://localhost:8000/mcp`
 - 协议：MCP Streamable HTTP
 - 本地运行：`python server.py` 启动服务
+- 配置文件：`config.json` 集中管理所有配置
+  - `wifi_password`: WiFi密码
+  - `menu`: 菜单列表
+  - `queue.min_people`: 最小排队人数
+  - `queue.max_people`: 最大排队人数
+  - `queue.minutes_per_person`: 每人预估等待分钟
 - 环境变量：
-  - `WIFI_PASSWORD`: 设置实际WiFi密码（默认 123789）
+  - `CONFIG_PATH`: 配置文件路径（默认 `config.json`）
+  - `WIFI_PASSWORD`: 覆盖WiFi密码（优先级高于配置文件）
   - `PORT`: 服务端口（默认 8000）
   - `HOST`: 绑定地址（默认 127.0.0.1）

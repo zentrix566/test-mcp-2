@@ -12,7 +12,8 @@ def test_list_tools():
     print("=== 测试列出工具 ===")
     response = requests.post(f"{BASE_URL}/mcp/list-tools")
     print(f"状态码: {response.status_code}")
-    print(f"响应: {response.json()}")
+    tools = response.json().get("tools", [])
+    print(f"可用工具: {[t['name'] for t in tools]}")
     print()
 
 def test_get_wifi_password():
@@ -27,6 +28,38 @@ def test_get_wifi_password():
     response = requests.post(f"{BASE_URL}/mcp/call-tool", json=payload)
     print(f"状态码: {response.status_code}")
     print(f"响应: {response.json()}")
+    print()
+
+def test_get_menu():
+    """测试获取菜单"""
+    print("=== 测试获取菜单 ===")
+    payload = {
+        "name": "get_menu",
+        "parameters": {
+            "question": "今天菜单有什么？"
+        }
+    }
+    response = requests.post(f"{BASE_URL}/mcp/call-tool", json=payload)
+    print(f"状态码: {response.status_code}")
+    data = response.json()
+    if data.get("content"):
+        print(f"菜单:\n{data['content'][0]['text']}")
+    print()
+
+def test_get_queue_status():
+    """测试获取排队状态"""
+    print("=== 测试获取排队状态 ===")
+    payload = {
+        "name": "get_queue_status",
+        "parameters": {
+            "question": "现在排了多少人？"
+        }
+    }
+    response = requests.post(f"{BASE_URL}/mcp/call-tool", json=payload)
+    print(f"状态码: {response.status_code}")
+    data = response.json()
+    if data.get("content"):
+        print(f"结果: {data['content'][0]['text']}")
     print()
 
 def test_unknown_tool():
@@ -45,6 +78,8 @@ if __name__ == "__main__":
     try:
         test_list_tools()
         test_get_wifi_password()
+        test_get_menu()
+        test_get_queue_status()
         test_unknown_tool()
         print("所有测试完成！")
     except requests.exceptions.ConnectionError:
