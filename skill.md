@@ -1,5 +1,5 @@
 ---
-name: wifi-query
+name: jinguyuan
 description: 查询预设WiFi密码和餐厅信息的MCP技能，包含WiFi密码、餐厅菜单、排队状态查询。
 version: 0.2.0
 alwaysApply: false
