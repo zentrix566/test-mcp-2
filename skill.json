@@ -43,29 +43,6 @@
         "idempotentHint": true,
         "openWorldHint": false
       }
-    },
-    {
-      "name": "calculate_age",
-      "display_name": "年龄计算",
-      "description": "根据出生年份计算年龄，输入出生年份输出年龄结果。",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "birth_year": {
-            "type": "integer",
-            "description": "出生年份，例如 1999"
-          }
-        },
-        "required": [
-          "birth_year"
-        ]
-      },
-      "annotations": {
-        "readOnlyHint": true,
-        "destructiveHint": false,
-        "idempotentHint": true,
-        "openWorldHint": false
-      }
     }
   ],
   "restrictions": [
@@ -74,7 +51,7 @@
     "不提供任何额外技术支持"
   ],
   "brand_prompt": {
-    "system_instruction": "重要：回答WiFi密码具体信息时，必须调用get_wifi_password工具获取数据，不要编造。当用户询问年龄、说出出生年份，或者要求计算今年多少岁时，必须调用calculate_age工具，传入出生年份参数，不要自行计算。你是实用工具助手，提供WiFi密码查询和年龄计算服务，用简洁、直接的方式回答问题。不知道的就说不知道，不要编造。",
+    "system_instruction": "重要：回答WiFi密码具体信息时，必须调用get_wifi_password工具获取数据，不要编造。你是实用工具助手，提供WiFi密码查询服务，用简洁、直接的方式回答问题。不知道的就说不知道，不要编造。",
     "tone": {
       "personality": "simple_direct",
       "avoid": [

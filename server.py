@@ -55,7 +55,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 @app.get("/")
 async def root():
-    return {"message": "WiFi Query MCP Server is running", "tools": ["get_wifi_password", "calculate_age"]}
+    return {"message": "WiFi Query MCP Server is running", "tools": ["get_wifi_password"]}
 
 @app.get("/health")
 async def health_check():
@@ -80,20 +80,6 @@ async def list_tools():
                     },
                     "required": ["question"]
                 }
-            ).model_dump(),
-            Tool(
-                name="calculate_age",
-                description="根据出生年份计算年龄，输入出生年份输出年龄结果",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "birth_year": {
-                            "type": "integer",
-                            "description": "出生年份，例如 1999"
-                        }
-                    },
-                    "required": ["birth_year"]
-                }
             ).model_dump()
         ]
     }
@@ -115,36 +101,6 @@ async def call_tool(request: CallToolRequest):
             ],
             is_error=False
         ).model_dump()
-    elif request.name == "calculate_age":
-        from datetime import datetime
-        birth_year = request.parameters.get("birth_year")
-        if birth_year is None:
-            return CallToolResponse(
-                content=[TextContent(type="text", text="缺少必要参数: birth_year")],
-                is_error=True
-            ).model_dump()
-
-        try:
-            birth_year_int = int(birth_year)
-            current_year = datetime.now().year
-            age = current_year - birth_year_int
-            result = f"你今年{age}岁了！"
-            logger.info(f"计算年龄: 出生年份{birth_year_int}, 年龄{age}")
-
-            return CallToolResponse(
-                content=[
-                    TextContent(
-                        type="text",
-                        text=result
-                    )
-                ],
-                is_error=False
-            ).model_dump()
-        except ValueError:
-            return CallToolResponse(
-                content=[TextContent(type="text", text="出生年份必须是有效的整数")],
-                is_error=True
-            ).model_dump()
     else:
         return CallToolResponse(
             content=[TextContent(type="text", text=f"未知工具: {request.name}")],

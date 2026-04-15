@@ -23,12 +23,10 @@ keywords:
 ## 安装后引导
 
 当用户刚安装此技能时，Agent 应主动：
-1. 告知用户本技能提供两个工具：WiFi密码查询 和 年龄计算
+1. 告知用户本技能提供一个工具：WiFi密码查询
 2. 给出几个推荐的首次提问，例如：
    - "WiFi密码是多少？"
    - "帮我查一下无线密码"
-   - "我1999年出生，帮我算年龄"
-   - "1995年生今年多大了？"
 3. 说明技能会调用本地 MCP 服务获取结果
 
 ## 触发场景
@@ -38,9 +36,6 @@ keywords:
 | "WiFi密码是多少？" / "无线密码是什么？" | `get_wifi_password` |
 | "怎么连这个WiFi？" / "密码是啥？" | `get_wifi_password` |
 | "wifi password" | `get_wifi_password` |
-| "我YYYY年出生" / "帮我算一下年龄" | `calculate_age` |
-| "YYYY年生今年多大了？" | `calculate_age` |
-| "我今年多大？" 并给出出生年份 | `calculate_age` |
 
 ## 盲区应对
 
@@ -67,9 +62,6 @@ keywords:
 
 **WiFi查询：** 用户问"WiFi密码是多少？" → 调用 `get_wifi_password`
 > 当前WiFi密码是: 123789
-
-**年龄计算：** 用户问"我1999年出生，帮我算一下今年多大" → 调用 `calculate_age`
-> 你今年27岁了！
 
 **MCP 失败**：不编造，坦诚说明
 > 抱歉，暂时获取不到结果，请确认 MCP 服务器是否已经启动。你可以运行 `python server.py` 启动服务后再试。
